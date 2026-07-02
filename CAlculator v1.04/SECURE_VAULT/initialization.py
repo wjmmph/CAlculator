@@ -64,29 +64,58 @@ class Initialize:
 
 
 
+import os
+import urllib.request
+import pygame
+
 class music_player:
     def __init__(self):
         self.started = False
+        
+        # 1. Set up an OS-independent relative path
+        self.asset_dir = "ASSETS"
+        # os.path.join ensures it uses the right slashes (\ for Windows, / for Mac/Linux)
+        self.music_file = os.path.join(self.asset_dir, "Where_Winds_Meets.mp3") 
+        
+        # 2. The direct download link to your audio file
+        self.music_url = "https://raw.githubusercontent.com/wjmmph/CAlculator/main/ASSETS/Where_Winds_Meets.mp3" 
 
     def play_init(self):
+        # 3. Create the ASSETS folder if it doesn't exist
+        if not os.path.exists(self.asset_dir):
+            os.makedirs(self.asset_dir)
+
+        # 4. Check if the file is already there; if not, download it!
+        if not os.path.exists(self.music_file):
+            print("Downloading background music. This only happens once...")
+            try:
+                urllib.request.urlretrieve(self.music_url, self.music_file)
+                print("Download complete!")
+            except Exception as e:
+                print(f"Could not download music (check internet connection): {e}")
+                return # Skip playing music if the download fails
+
+        # 5. Initialize pygame and load the local file
         pygame.mixer.init()
-        pygame.mixer.music.load(r"C:\Users\LRP\Downloads\where_winds_meets.mp3")
-        
+        pygame.mixer.music.load(self.music_file)
+
     def play_music(self):
-        pygame.mixer.music.play(-1)
-        self.started = True
+        # We need a quick check to ensure the file loaded properly before playing
+        if os.path.exists(self.music_file):
+            pygame.mixer.music.play(-1)
+            self.started = True
 
     def stop_music(self):
         pygame.mixer.music.stop()
         self.started = False
 
-    def resume_music(self):
-        pygame.mixer.music.unpause()
-        self.started = True
-
     def pause_music(self):
         pygame.mixer.music.pause()
         self.started = False
+
+    def resume_music(self):
+        if self.started: # Only unpause if it was already playing
+            pygame.mixer.music.unpause()
 
 
 
