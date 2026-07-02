@@ -11,7 +11,7 @@ from GAME.choice import choice_instance
 from GAME.exit import exit
 
 
-
+print("\nPlease Connect to the Internet, if you are using the program first time.\n")
 
 
 
